@@ -80,6 +80,8 @@ body { font-family: -apple-system, Arial, sans-serif; background: #f4f7f2; min-h
     <div class="sub" id="date-sub"></div>
   </div>
   <div class="date-badge" id="date-badge"></div>
+  <button id="btn-data" title="Selecionar data" style="background:none;border:none;cursor:pointer;font-size:22px;padding:4px;">&#128197;</button>
+  <input type="date" id="input-data" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;" />
 </div>
 
 <div class="container">
@@ -154,7 +156,9 @@ var CHART_COLORS = ['#2e7d32','#f39200','#1565c0','#c62828','#6a1b9a','#00838f',
 var produtos = ['200G','Premium','Bandejao','AP'];
 var meeiros  = ['Camila','Sitio','Juliano','Gervasio','Lucia','Demercino','Nei','Gildemar','Olismar','Eric','Jean','Alberto','Tiago','Karen','Francielton','Inacio','Fernanda','Marcia','Rodrigo','Mateus Chaves'];
 var valores  = {};
-var hoje = new Date().toLocaleDateString('pt-BR');
+var dataAtual = new Date();
+var hoje = dataAtual.toISOString().slice(0,10);
+var hojeFormatado = dataAtual.toLocaleDateString('pt-BR');
 
 function setStatus(msg, tipo) {
   var el = document.getElementById('status-bar');
@@ -190,7 +194,7 @@ async function supabaseUpsert(tabela, dados) {
 
 async function carregarDados() {
   try {
-    setStatus('Carregando dados de hoje...');
+    setStatus('Carregando dados de ' + hojeFormatado + '...');
     var dados = await supabaseGet('coleta', 'data=eq.' + hoje + '&select=*');
     if (dados && dados.length > 0) {
       valores = {};
@@ -212,7 +216,7 @@ async function carregarDados() {
 
 async function salvarDados() {
   try {
-    setStatus('Salvando...');
+    setStatus('Salvando dados de ' + hojeFormatado + '...');
     var registros = [];
     for (var mi = 0; mi < meeiros.length; mi++) {
       var m = meeiros[mi];
@@ -346,9 +350,9 @@ function limparValores(){valores={};render();}
 
 function gerarCSV(){
   var csv='Data,Meeiro,'+produtos.join(',')+',Total\n';
-  for(var mi=0;mi<meeiros.length;mi++){var m=meeiros[mi];var t=0;var row=[];for(var pi=0;pi<produtos.length;pi++){var v=parseFloat((valores[m]&&valores[m][produtos[pi]])||0);t+=v;row.push(v);}csv+=hoje+','+m+','+row.join(',')+','+t+'\n';}
+  for(var mi=0;mi<meeiros.length;mi++){var m=meeiros[mi];var t=0;var row=[];for(var pi=0;pi<produtos.length;pi++){var v=parseFloat((valores[m]&&valores[m][produtos[pi]])||0);t+=v;row.push(v);}csv+=hojeFormatado+','+m+','+row.join(',')+','+t+'\n';}
   var tots=[];var gt=0;for(var pi2=0;pi2<produtos.length;pi2++){var s=0;for(var mi2=0;mi2<meeiros.length;mi2++)s+=parseFloat((valores[meeiros[mi2]]&&valores[meeiros[mi2]][produtos[pi2]])||0);gt+=s;tots.push(s);}
-  csv+=hoje+',TOTAL,'+tots.join(',')+','+gt+'\n';
+  csv+=hojeFormatado+',TOTAL,'+tots.join(',')+','+gt+'\n';
   return csv;
 }
 
@@ -365,8 +369,23 @@ document.getElementById('new-meeiro').onkeydown=function(e){if(e.key==='Enter'){
 var d=new Date();
 var opts={weekday:'long',day:'2-digit',month:'long',year:'numeric'};
 var lbl=d.toLocaleDateString('pt-BR',opts);
-document.getElementById('date-badge').textContent=d.toLocaleDateString('pt-BR');
+document.getElementById('date-badge').textContent=hojeFormatado; document.getElementById('input-data').value=hoje;
 document.getElementById('date-sub').textContent=lbl.charAt(0).toUpperCase()+lbl.slice(1);
+
+document.getElementById('btn-data').onclick = function() {
+  document.getElementById('input-data').click();
+};
+
+document.getElementById('input-data').onchange = function() {
+  if (!this.value) return;
+  hoje = this.value;
+  var partes = hoje.split('-');
+  hojeFormatado = partes[2] + '/' + partes[1] + '/' + partes[0];
+  document.getElementById('date-badge').textContent = hojeFormatado;
+  valores = {};
+  render();
+  carregarDados();
+};
 
 carregarDados();
 </script>
