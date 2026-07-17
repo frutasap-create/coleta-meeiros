@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Coleta Meeiros v8 - AP</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+body { font-family: -apple-system, Arial, sans-serif; background: #f4f7f2; min-height: 100vh; }
+
+.header { background:#fff; border-bottom:3px solid #2e7d32; padding:12px 16px; display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:100; box-shadow:0 2px 6px rgba(0,0,0,.08); }
+.logo { width:44px;height:44px;min-width:44px;background:#2e7d32;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:900; }
+.header-text { flex:1; }
+.header-text h1 { font-size:16px;font-weight:700;color:#1b5e20;line-height:1.2; }
+.header-text .sub { font-size:11px;color:#888;margin-top:2px; }
+.date-badge { background:#e8f5e9;border:1px solid #a5d6a7;border-radius:20px;padding:4px 10px;font-size:11px;color:#2e7d32;font-weight:700;white-space:nowrap; }
+
+.container { max-width:700px;margin:0 auto;padding:12px 10px 40px; }
+.card { background:#fff;border-radius:12px;border:1px solid #e0e0e0;padding:12px 14px;margin-bottom:10px; }
+.sec-label { font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#888;margin-bottom:8px; }
+
+.tags { display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;min-height:10px; }
+.tag { display:inline-flex;align-items:center;gap:4px;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:20px;padding:4px 8px 4px 12px;font-size:13px;color:#1b5e20; }
+.tag-x { background:none;border:none;color:#4caf50;font-size:18px;font-weight:700;cursor:pointer;padding:0 2px;line-height:1; }
+
+.add-row { display:flex;gap:8px; }
+.add-row input { flex:1;border:1.5px solid #ccc;border-radius:10px;padding:10px 12px;font-size:15px;outline:none;min-width:0;-webkit-appearance:none; }
+.add-row input:focus { border-color:#4caf50; }
+.btn-g { background:#2e7d32;color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;-webkit-appearance:none; }
+.btn-o { background:#fff;color:#2e7d32;border:2px solid #4caf50;border-radius:10px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;-webkit-appearance:none; }
+.btn-r { background:#c62828;color:#fff;border:none;border-radius:10px;padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;-webkit-appearance:none; }
+
+.meeiro-card { background:#fff;border-radius:12px;border:1px solid #e0e0e0;margin-bottom:8px;overflow:hidden; }
+.m-header { display:flex;align-items:center;gap:10px;padding:10px 12px;border-bottom:1px solid #f0f0f0; }
+.avatar { width:34px;height:34px;min-width:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700; }
+.m-name { font-size:15px;font-weight:600;color:#212121;flex:1; }
+.del-btn { background:none;border:none;color:#ccc;font-size:20px;padding:4px 8px;cursor:pointer;border-radius:8px; }
+
+.prods-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;padding:10px 12px; }
+.pf label { display:block;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px; }
+.pf input { border:1.5px solid #ddd;border-radius:8px;padding:8px 6px;font-size:16px;text-align:center;width:100%;font-weight:700;color:#212121;background:#fafafa;-webkit-appearance:none;outline:none; }
+.pf input:focus { border-color:#4caf50;background:#fff; }
+.m-total-box { border:2px solid #2e7d32;border-radius:8px;padding:8px 6px;font-size:16px;text-align:center;font-weight:700;color:#2e7d32;background:#e8f5e9; }
+
+.totais-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:8px; }
+.tc { background:#e8f5e9;border-radius:10px;padding:10px 8px;text-align:center; }
+.tc .tl { font-size:10px;color:#4caf50;font-weight:700;text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px; }
+.tc .tv { font-size:20px;font-weight:700;color:#1b5e20; }
+.tc.geral { background:#2e7d32; }
+.tc.geral .tl { color:#a5d6a7; }
+.tc.geral .tv { color:#fff; }
+
+.chart-wrap { text-align:center;margin-top:8px; }
+.chart-wrap canvas { display:block;margin:0 auto;max-width:260px; }
+.legend { margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;justify-content:center; }
+.legend-item { display:flex;align-items:center;gap:5px;font-size:12px;font-weight:600;color:#333; }
+.legend-dot { width:13px;height:13px;min-width:13px;border-radius:3px;display:inline-block; }
+
+.actions { display:flex;gap:8px;margin-top:10px;flex-wrap:wrap; }
+.empty { text-align:center;padding:20px;color:#bbb;font-size:14px;border:1.5px dashed #ddd;border-radius:12px;margin-bottom:8px; }
+
+.modal-overlay { display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:200;padding:20px; }
+.modal-overlay.open { display:flex;align-items:center;justify-content:center; }
+.modal-box { background:#fff;border-radius:16px;padding:16px;width:100%;max-width:500px;max-height:80vh;display:flex;flex-direction:column;gap:10px; }
+.modal-box h3 { font-size:15px;font-weight:700;color:#1b5e20; }
+.modal-box textarea { flex:1;border:1.5px solid #ddd;border-radius:8px;padding:10px;font-size:12px;font-family:monospace;min-height:200px;resize:none;outline:none; }
+.modal-close-row { display:flex;gap:8px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">AP</div>
+  <div class="header-text">
+    <h1>Coleta de Dados — Meeiros v8</h1>
+    <div class="sub" id="date-sub"></div>
+  </div>
+  <div class="date-badge" id="date-badge"></div>
+</div>
+
+<div class="container">
+  <div class="card">
+    <div class="sec-label">Produtos</div>
+    <div class="tags" id="prod-tags"></div>
+    <div class="add-row">
+      <input type="text" id="new-prod" placeholder="Novo produto..." maxlength="30" autocomplete="off">
+      <button class="btn-g" id="btn-add-prod">+ Produto</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="sec-label">Adicionar Meeiro</div>
+    <div class="add-row">
+      <input type="text" id="new-meeiro" placeholder="Nome do meeiro..." maxlength="30" autocomplete="off">
+      <button class="btn-g" id="btn-add-meeiro">+ Meeiro</button>
+    </div>
+  </div>
+
+  <div id="meeiros-list"></div>
+
+  <div class="card">
+    <div class="sec-label">Totais por produto</div>
+    <div class="totais-grid" id="totais-grid"></div>
+  </div>
+
+  <div class="card">
+    <div class="sec-label">Distribuicao por produto</div>
+    <div class="chart-wrap">
+      <canvas id="pizza-chart" width="300" height="300"></canvas>
+    </div>
+    <div class="legend" id="pizza-legend"></div>
+  </div>
+
+  <div class="card">
+    <div class="sec-label">Divisao de Lucro</div>
+    <div class="chart-wrap">
+      <canvas id="lucro-chart" width="300" height="300"></canvas>
+    </div>
+    <div class="legend" id="lucro-legend"></div>
+  </div>
+
+  <div class="actions">
+    <button class="btn-g" id="btn-csv">Ver CSV</button>
+    <button class="btn-r" id="btn-limpar">Limpar valores</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="csv-modal">
+  <div class="modal-box">
+    <h3>Dados do dia - selecione tudo e copie</h3>
+    <textarea id="csv-text" readonly></textarea>
+    <div class="modal-close-row">
+      <button class="btn-g" id="btn-copy-csv">Copiar tudo</button>
+      <button class="btn-o" id="btn-fechar-modal">Fechar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var BGCOLORS = ['#c8e6c9','#b3e5fc','#ffe0b2','#f8bbd0','#d1c4e9','#b2dfdb','#fff9c4','#ffccbc'];
+var TXCOLORS = ['#1b5e20','#01579b','#e65100','#880e4f','#311b92','#004d40','#f57f17','#bf360c'];
+var CHART_COLORS = ['#2e7d32','#f39200','#1565c0','#c62828','#6a1b9a','#00838f','#f9a825','#558b2f','#4e342e','#37474f'];
+
+var produtos = ['200G','Premium','Bandejao','AP'];
+var meeiros  = ['Camila','Sitio','Juliano','Gervasio','Lucia','Demercino','Nei','Gildemar','Olismar','Eric','Jean','Alberto','Tiago','Karen','Francielton','Inacio','Fernanda','Marcia','Rodrigo','Mateus Chaves'];
+var valores  = {};
+
+function ini(n) {
+  return n.split(' ').slice(0,2).map(function(w){ return w[0].toUpperCase(); }).join('');
+}
+function colorIdx(name) {
+  var h = 0;
+  for (var i = 0; i < name.length; i++) h = (h * 31 + name.charCodeAt(i)) & 0xffff;
+  return h % BGCOLORS.length;
+}
+function fmt(v) { return v % 1 === 0 ? v : v.toFixed(1); }
+
+function render() {
+  renderProdTags();
+  renderMeeiros();
+  renderTotais();
+}
+
+function renderProdTags() {
+  var el = document.getElementById('prod-tags');
+  if (!produtos.length) { el.innerHTML = '<span style="font-size:13px;color:#aaa">Nenhum produto.</span>'; return; }
+  var html = '';
+  for (var i = 0; i < produtos.length; i++) {
+    html += '<span class="tag">' + produtos[i] + '<button class="tag-x" data-i="' + i + '">x</button></span>';
+  }
+  el.innerHTML = html;
+  var btns = el.getElementsByClassName('tag-x');
+  for (var j = 0; j < btns.length; j++) {
+    btns[j].onclick = function() {
+      var idx = parseInt(this.getAttribute('data-i'));
+      var nome = produtos[idx];
+      produtos.splice(idx, 1);
+      for (var m in valores) { if (valores[m]) delete valores[m][nome]; }
+      render();
+    };
+  }
+}
+
+function renderMeeiros() {
+  var el = document.getElementById('meeiros-list');
+  if (!meeiros.length) { el.innerHTML = '<div class="empty">Nenhum meeiro cadastrado.</div>'; return; }
+  var html = '';
+  for (var mi = 0; mi < meeiros.length; mi++) {
+    var m = meeiros[mi];
+    var c = colorIdx(m);
+    var fields = '';
+    if (produtos.length) {
+      for (var pi = 0; pi < produtos.length; pi++) {
+        var p = produtos[pi];
+        var val = (valores[m] && valores[m][p] !== undefined && valores[m][p] !== '') ? valores[m][p] : '';
+        fields += '<div class="pf"><label>' + p + '</label><input type="number" inputmode="decimal" min="0" step="0.5" placeholder="0" value="' + val + '" data-mi="' + mi + '" data-pi="' + pi + '"></div>';
+      }
+      fields += '<div class="pf"><label>Total</label><div class="m-total-box" id="total-' + mi + '">0</div></div>';
+    } else {
+      fields = '<span style="font-size:13px;color:#aaa;padding:8px 0;display:block">Adicione produtos acima.</span>';
+    }
+    html += '<div class="meeiro-card">';
+    html += '<div class="m-header">';
+    html += '<div class="avatar" style="background:' + BGCOLORS[c] + ';color:' + TXCOLORS[c] + '">' + ini(m) + '</div>';
+    html += '<span class="m-name">' + m + '</span>';
+    html += '<button class="del-btn" data-mi="' + mi + '">&#x1F5D1;</button>';
+    html += '</div>';
+    html += '<div class="prods-grid">' + fields + '</div>';
+    html += '</div>';
+  }
+  el.innerHTML = html;
+
+  var delBtns = el.getElementsByClassName('del-btn');
+  for (var d = 0; d < delBtns.length; d++) {
+    delBtns[d].onclick = function() {
+      var idx = parseInt(this.getAttribute('data-mi'));
+      meeiros.splice(idx, 1);
+      delete valores[meeiros[idx]];
+      render();
+    };
+  }
+
+  var inputs = el.querySelectorAll('input[type="number"]');
+  for (var k = 0; k < inputs.length; k++) {
+    inputs[k].oninput = function() {
+      var mi2 = parseInt(this.getAttribute('data-mi'));
+      var pi2 = parseInt(this.getAttribute('data-pi'));
+      var m2  = meeiros[mi2];
+      var p2  = produtos[pi2];
+      if (!valores[m2]) valores[m2] = {};
+      valores[m2][p2] = this.value === '' ? '' : (parseFloat(this.value) || 0);
+      renderTotais();
+    };
+  }
+}
+
+function getTotaisProd() {
+  var totais = [];
+  var geral = 0;
+  for (var pi = 0; pi < produtos.length; pi++) {
+    var s = 0;
+    for (var mi = 0; mi < meeiros.length; mi++) {
+      s += parseFloat((valores[meeiros[mi]] && valores[meeiros[mi]][produtos[pi]]) || 0);
+    }
+    totais.push(s);
+    geral += s;
+  }
+  return { totais: totais, geral: geral };
+}
+
+function renderTotais() {
+  var data = getTotaisProd();
+  var el = document.getElementById('totais-grid');
+  if (!produtos.length) { el.innerHTML = ''; }
+  else {
+    var html = '';
+    for (var pi = 0; pi < produtos.length; pi++) {
+      html += '<div class="tc"><div class="tl">' + produtos[pi] + '</div><div class="tv">' + fmt(data.totais[pi]) + '</div></div>';
+    }
+    html += '<div class="tc geral"><div class="tl">Total Geral</div><div class="tv">' + fmt(data.geral) + '</div></div>';
+    el.innerHTML = html;
+  }
+
+  for (var mi2 = 0; mi2 < meeiros.length; mi2++) {
+    var m2 = meeiros[mi2];
+    var t = 0;
+    for (var pi2 = 0; pi2 < produtos.length; pi2++) {
+      t += parseFloat((valores[m2] && valores[m2][produtos[pi2]]) || 0);
+    }
+    var el2 = document.getElementById('total-' + mi2);
+    if (el2) el2.textContent = fmt(t);
+  }
+
+  drawPizzaChart(data);
+  drawLucroChart(data.geral);
+}
+
+function drawPizzaChart(data) {
+  var canvas = document.getElementById('pizza-chart');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  var cx = W/2, cy = H/2, r = W/2 - 10;
+  var legendHtml = '';
+
+  if (data.geral === 0) {
+    ctx.fillStyle = '#eee';
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#aaa'; ctx.font = '14px -apple-system,Arial';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('Sem dados', cx, cy);
+    document.getElementById('pizza-legend').innerHTML = '';
+    return;
+  }
+
+  var startAngle = -Math.PI / 2;
+  for (var i = 0; i < produtos.length; i++) {
+    if (data.totais[i] === 0) continue;
+    var slice = (data.totais[i] / data.geral) * Math.PI * 2;
+    var color = CHART_COLORS[i % CHART_COLORS.length];
+    ctx.beginPath(); ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, startAngle, startAngle + slice);
+    ctx.closePath(); ctx.fillStyle = color; ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+
+    var mid = startAngle + slice / 2;
+    var lx = cx + r * 0.62 * Math.cos(mid);
+    var ly = cy + r * 0.62 * Math.sin(mid);
+    var pct = ((data.totais[i] / data.geral) * 100).toFixed(1);
+    if (slice > 0.18) {
+      ctx.fillStyle = '#fff'; ctx.font = 'bold 13px -apple-system,Arial';
+      ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(pct + '%', lx, ly);
+    }
+    legendHtml += '<div class="legend-item"><span class="legend-dot" style="background:' + color + '"></span>' + produtos[i] + ': ' + fmt(data.totais[i]) + ' (' + pct + '%)</div>';
+    startAngle += slice;
+  }
+  document.getElementById('pizza-legend').innerHTML = legendHtml;
+}
+
+function drawLucroChart(geral) {
+  var canvas = document.getElementById('lucro-chart');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+  var W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+  var cx = W/2, cy = H/2, r = W/2 - 10;
+
+  var partes = [
+    { label: 'Meeiros', pct: 0.40, color: '#f39200' },
+    { label: 'Sitio AP', pct: 0.60, color: '#2e7d32' }
+  ];
+
+  if (!geral) {
+    ctx.fillStyle = '#eee';
+    ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI*2); ctx.fill();
+    ctx.fillStyle = '#aaa'; ctx.font = '14px -apple-system,Arial';
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillText('Sem dados', cx, cy);
+    document.getElementById('lucro-legend').innerHTML = '';
+    return;
+  }
+
+  var startAngle = -Math.PI / 2;
+  var legendHtml = '';
+  for (var i = 0; i < partes.length; i++) {
+    var slice = partes[i].pct * Math.PI * 2;
+    var caixas = geral * partes[i].pct;
+    ctx.beginPath(); ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, startAngle, startAngle + slice);
+    ctx.closePath(); ctx.fillStyle = partes[i].color; ctx.fill();
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+
+    var mid = startAngle + slice / 2;
+    var lx = cx + r * 0.60 * Math.cos(mid);
+    var ly = cy + r * 0.60 * Math.sin(mid);
+    ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.font = 'bold 15px -apple-system,Arial';
+    ctx.fillText((partes[i].pct * 100) + '%', lx, ly - 9);
+    ctx.font = '12px -apple-system,Arial';
+    ctx.fillText(fmt(caixas) + ' cx', lx, ly + 9);
+
+    legendHtml += '<div class="legend-item"><span class="legend-dot" style="background:' + partes[i].color + '"></span>' + partes[i].label + ': ' + (partes[i].pct * 100) + '% — ' + fmt(caixas) + ' caixas</div>';
+    startAngle += slice;
+  }
+  document.getElementById('lucro-legend').innerHTML = legendHtml;
+}
+
+function addProduto() {
+  var inp = document.getElementById('new-prod');
+  var n = inp.value.trim();
+  if (!n) return;
+  for (var i = 0; i < produtos.length; i++) { if (produtos[i] === n) { inp.value = ''; return; } }
+  produtos.push(n); inp.value = ''; render();
+}
+
+function addMeeiro() {
+  var inp = document.getElementById('new-meeiro');
+  var n = inp.value.trim();
+  if (!n) return;
+  for (var i = 0; i < meeiros.length; i++) { if (meeiros[i] === n) { inp.value = ''; return; } }
+  meeiros.push(n); inp.value = ''; render();
+}
+
+function limparValores() { valores = {}; render(); }
+
+function gerarCSV() {
+  var hoje = new Date().toLocaleDateString('pt-BR');
+  var csv = 'Data,Meeiro,' + produtos.join(',') + ',Total\n';
+  for (var mi = 0; mi < meeiros.length; mi++) {
+    var m = meeiros[mi]; var t = 0; var row = [];
+    for (var pi = 0; pi < produtos.length; pi++) {
+      var v = parseFloat((valores[m] && valores[m][produtos[pi]]) || 0);
+      t += v; row.push(v);
+    }
+    csv += hoje + ',' + m + ',' + row.join(',') + ',' + t + '\n';
+  }
+  var tots = []; var gt = 0;
+  for (var pi2 = 0; pi2 < produtos.length; pi2++) {
+    var s = 0;
+    for (var mi2 = 0; mi2 < meeiros.length; mi2++) s += parseFloat((valores[meeiros[mi2]] && valores[meeiros[mi2]][produtos[pi2]]) || 0);
+    gt += s; tots.push(s);
+  }
+  csv += hoje + ',TOTAL,' + tots.join(',') + ',' + gt + '\n';
+  return csv;
+}
+
+document.getElementById('btn-add-prod').onclick = addProduto;
+document.getElementById('btn-add-meeiro').onclick = addMeeiro;
+document.getElementById('btn-limpar').onclick = limparValores;
+document.getElementById('btn-csv').onclick = function() {
+  document.getElementById('csv-text').value = gerarCSV();
+  document.getElementById('csv-modal').className = 'modal-overlay open';
+};
+document.getElementById('btn-fechar-modal').onclick = function() {
+  document.getElementById('csv-modal').className = 'modal-overlay';
+};
+document.getElementById('btn-copy-csv').onclick = function() {
+  var ta = document.getElementById('csv-text');
+  ta.select();
+  try { document.execCommand('copy'); document.getElementById('btn-copy-csv').textContent = 'Copiado!'; setTimeout(function(){ document.getElementById('btn-copy-csv').textContent = 'Copiar tudo'; }, 2000); } catch(e) {}
+};
+document.getElementById('new-prod').onkeydown = function(e) { if (e.key === 'Enter') { e.preventDefault(); addProduto(); } };
+document.getElementById('new-meeiro').onkeydown = function(e) { if (e.key === 'Enter') { e.preventDefault(); addMeeiro(); } };
+
+var d = new Date();
+var opts = { weekday:'long', day:'2-digit', month:'long', year:'numeric' };
+var lbl = d.toLocaleDateString('pt-BR', opts);
+document.getElementById('date-badge').textContent = d.toLocaleDateString('pt-BR');
+document.getElementById('date-sub').textContent = lbl.charAt(0).toUpperCase() + lbl.slice(1);
+
+render();
+</script>
+</body>
+</html>
