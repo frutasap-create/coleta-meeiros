@@ -79,9 +79,10 @@ body { font-family: -apple-system, Arial, sans-serif; background: #f4f7f2; min-h
     <h1>Coleta de Dados — Meeiros v8</h1>
     <div class="sub" id="date-sub"></div>
   </div>
-  <div class="date-badge" id="date-badge"></div>
-  <button id="btn-data" title="Selecionar data" style="background:none;border:none;cursor:pointer;font-size:22px;padding:4px;">&#128197;</button>
-  <input type="date" id="input-data" style="position:absolute;opacity:0;pointer-events:none;width:0;height:0;" />
+  <div style="position:relative;display:inline-block;">
+    <div class="date-badge" id="date-badge"></div>
+    <input type="date" id="input-data" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px;" />
+  </div>
 </div>
 
 <div class="container">
@@ -371,10 +372,6 @@ var opts={weekday:'long',day:'2-digit',month:'long',year:'numeric'};
 var lbl=d.toLocaleDateString('pt-BR',opts);
 document.getElementById('date-badge').textContent=hojeFormatado; document.getElementById('input-data').value=hoje;
 document.getElementById('date-sub').textContent=lbl.charAt(0).toUpperCase()+lbl.slice(1);
-
-document.getElementById('btn-data').onclick = function() {
-  document.getElementById('input-data').click();
-};
 
 document.getElementById('input-data').onchange = function() {
   if (!this.value) return;
