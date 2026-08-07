@@ -233,7 +233,8 @@ function salvarDados() {
   }).then(function(res) {
     if (!res) return;
     if (res.ok || res.status === 201) {
-      setStatus('Dados salvos com sucesso! ' + new Date().toLocaleTimeString('pt-BR'), 'ok');
+      setStatus('Dados salvos! Sincronizando com Planner...', 'ok');
+      sincronizarPlanner();
     } else {
       setStatus('Erro ao salvar. Status: ' + res.status, 'err');
     }
@@ -347,6 +348,71 @@ function drawLucroChart(geral) {
     startAngle+=slice;
   }
   document.getElementById('lucro-legend').innerHTML=legendHtml;
+}
+
+// Mapeamento produtos Coleta → Planner
+var PLANNER_FORNECEDOR_ID = 'a0312074-2491-4ded-af32-a59ebe8f3737';
+var PLANNER_PRODUTO_MAP = {
+  '200G':     '3f0a316e-0905-443f-adec-cfbc2e3e6633',
+  'Premium':  '527d5a96-eb94-4f7f-9003-45721ec398d9',
+  'Bandejao': 'decb2668-2475-402c-86ea-701f7f3caea8',
+  'AP':       '6603d01f-7beb-4625-823b-4b7defad4886'
+};
+
+function sincronizarPlanner() {
+  // Calcular totais por produto
+  var totais = {};
+  for (var pi = 0; pi < produtos.length; pi++) {
+    var p = produtos[pi];
+    var plannerProdId = PLANNER_PRODUTO_MAP[p];
+    if (!plannerProdId) continue;
+    var soma = 0;
+    for (var mi = 0; mi < meeiros.length; mi++) {
+      soma += parseFloat((valores[meeiros[mi]] && valores[meeiros[mi]][p]) || 0);
+    }
+    if (soma > 0) totais[plannerProdId] = soma;
+  }
+
+  if (Object.keys(totais).length === 0) {
+    setStatus('Dados salvos! Nenhum total para enviar ao Planner.', 'ok');
+    return;
+  }
+
+  // Primeiro apaga entradas do dia para o fornecedor Meeiros no Planner
+  fetch(SUPABASE_URL + '/rest/v1/entradas?data=eq.' + hoje + '&fornecedor_id=eq.' + PLANNER_FORNECEDOR_ID, {
+    method: 'DELETE',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY
+    }
+  }).then(function() {
+    var rows = [];
+    for (var prodId in totais) {
+      rows.push({
+        data: hoje,
+        fornecedor_id: PLANNER_FORNECEDOR_ID,
+        produto_id: prodId,
+        quantidade: totais[prodId]
+      });
+    }
+    return fetch(SUPABASE_URL + '/rest/v1/entradas', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(rows)
+    });
+  }).then(function(res) {
+    if (res && (res.ok || res.status === 201)) {
+      setStatus('Dados salvos e sincronizados com o Planner Morango!', 'ok');
+    } else {
+      setStatus('Dados salvos! Erro ao sincronizar com Planner.', 'err');
+    }
+  }).catch(function() {
+    setStatus('Dados salvos! Erro de conexao com Planner.', 'err');
+  });
 }
 
 function addProduto(){var inp=document.getElementById('new-prod');var n=inp.value.trim();if(!n)return;for(var i=0;i<produtos.length;i++){if(produtos[i]===n){inp.value='';return;}}produtos.push(n);inp.value='';render();}
