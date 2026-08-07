@@ -167,36 +167,18 @@ function setStatus(msg, tipo) {
   el.className = 'status-bar' + (tipo ? ' ' + tipo : '');
 }
 
-async function supabaseGet(tabela, filtros) {
-  var url = SUPABASE_URL + '/rest/v1/' + tabela + '?';
-  if (filtros) url += filtros;
-  var res = await fetch(url, {
+
+
+function carregarDados() {
+  setStatus('Carregando dados de ' + hojeFormatado + '...');
+  fetch(SUPABASE_URL + '/rest/v1/coleta?data=eq.' + hoje + '&select=*', {
     headers: {
       'apikey': SUPABASE_KEY,
       'Authorization': 'Bearer ' + SUPABASE_KEY
     }
-  });
-  return res.json();
-}
-
-async function supabaseUpsert(tabela, dados) {
-  var res = await fetch(SUPABASE_URL + '/rest/v1/' + tabela, {
-    method: 'POST',
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY,
-      'Content-Type': 'application/json',
-      'Prefer': 'resolution=merge-duplicates'
-    },
-    body: JSON.stringify(dados)
-  });
-  return res;
-}
-
-async function carregarDados() {
-  try {
-    setStatus('Carregando dados de ' + hojeFormatado + '...');
-    var dados = await supabaseGet('coleta', 'data=eq.' + hoje + '&select=*');
+  }).then(function(res) {
+    return res.json();
+  }).then(function(dados) {
     if (dados && dados.length > 0) {
       valores = {};
       for (var i = 0; i < dados.length; i++) {
@@ -204,38 +186,60 @@ async function carregarDados() {
         if (!valores[row.meeiro]) valores[row.meeiro] = {};
         valores[row.meeiro][row.produto] = row.quantidade;
       }
-      setStatus('Dados de hoje carregados com sucesso!', 'ok');
+      setStatus('Dados de ' + hojeFormatado + ' carregados!', 'ok');
     } else {
-      setStatus('Nenhum dado salvo hoje ainda.', 'ok');
+      setStatus('Nenhum dado salvo para ' + hojeFormatado + '.', 'ok');
     }
     render();
-  } catch(e) {
-    setStatus('Erro ao carregar dados. Verifique a conexao.', 'err');
+  }).catch(function(e) {
+    setStatus('Erro ao carregar dados.', 'err');
     render();
-  }
+  });
 }
 
-async function salvarDados() {
-  try {
-    setStatus('Salvando dados de ' + hojeFormatado + '...');
+function salvarDados() {
+  setStatus('Salvando dados de ' + hojeFormatado + '...');
+  
+  // Primeiro apaga os registros do dia, depois insere os novos
+  fetch(SUPABASE_URL + '/rest/v1/coleta?data=eq.' + hoje, {
+    method: 'DELETE',
+    headers: {
+      'apikey': SUPABASE_KEY,
+      'Authorization': 'Bearer ' + SUPABASE_KEY
+    }
+  }).then(function() {
     var registros = [];
     for (var mi = 0; mi < meeiros.length; mi++) {
       var m = meeiros[mi];
       for (var pi = 0; pi < produtos.length; pi++) {
         var p = produtos[pi];
         var v = parseFloat((valores[m] && valores[m][p]) || 0);
-        registros.push({ data: hoje, meeiro: m, produto: p, quantidade: v });
+        if (v > 0) registros.push({ data: hoje, meeiro: m, produto: p, quantidade: v });
       }
     }
-    var res = await supabaseUpsert('coleta', registros);
-    if (res.ok || res.status === 201) {
-      setStatus('Dados salvos com sucesso!', 'ok');
-    } else {
-      setStatus('Erro ao salvar. Tente novamente.', 'err');
+    if (registros.length === 0) {
+      setStatus('Nenhum valor preenchido para salvar.', 'err');
+      return;
     }
-  } catch(e) {
-    setStatus('Erro ao salvar. Verifique a conexao.', 'err');
-  }
+    return fetch(SUPABASE_URL + '/rest/v1/coleta', {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(registros)
+    });
+  }).then(function(res) {
+    if (!res) return;
+    if (res.ok || res.status === 201) {
+      setStatus('Dados salvos com sucesso! ' + new Date().toLocaleTimeString('pt-BR'), 'ok');
+    } else {
+      setStatus('Erro ao salvar. Status: ' + res.status, 'err');
+    }
+  }).catch(function(e) {
+    setStatus('Erro de conexao ao salvar.', 'err');
+  });
 }
 
 function ini(n) { return n.split(' ').slice(0,2).map(function(w){ return w[0].toUpperCase(); }).join(''); }
