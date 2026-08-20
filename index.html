@@ -1,4 +1,4 @@
-DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -375,12 +375,17 @@ function carregarProdutosPlanner() {
   .catch(function(){});
 }
 
+function normalizar(str) {
+  return str.toLowerCase().trim()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]/g, '');
+}
+
 function buscarIdProdutoPlanner(nomeProduto) {
-  var n = nomeProduto.toLowerCase().trim();
+  var n = normalizar(nomeProduto);
   for (var i = 0; i < plannerProdutos.length; i++) {
-    var pn = plannerProdutos[i].nome.toLowerCase().trim();
+    var pn = normalizar(plannerProdutos[i].nome);
     if (pn === n) return plannerProdutos[i].id;
-    // Match parcial: "200g" bate com "200G", "premium" bate com "Camada Premium"
     if (pn.indexOf(n) !== -1 || n.indexOf(pn) !== -1) return plannerProdutos[i].id;
   }
   return null;
