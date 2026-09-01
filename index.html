@@ -200,6 +200,14 @@ function carregarDados() {
   });
 }
 
+var _timerSalvar = null;
+function agendarSalvamento() {
+  if (_timerSalvar) clearTimeout(_timerSalvar);
+  _timerSalvar = setTimeout(function() {
+    salvarDados();
+  }, 2000);
+}
+
 function showToast(msg, erro) {
   var t = document.getElementById('toast-msg');
   t.textContent = msg;
@@ -436,7 +444,7 @@ function sincronizarPlanner() {
     });
   }).then(function(res) {
     if (res && (res.ok || res.status === 201)) {
-      setStatus('Dados salvos e sincronizados com o Planner!', 'ok'); showToast('✅ Dados salvos e enviados ao Planner!');
+      setStatus('Dados salvos e sincronizados com o Planner!', 'ok'); showToast('✅ Salvo e enviado ao Planner!');
     } else {
       setStatus('Dados salvos! Erro ao sincronizar com Planner.', 'err'); showToast('✅ Dados salvos! (Planner com erro)', true);
     }
@@ -445,8 +453,8 @@ function sincronizarPlanner() {
   });
 }
 
-function addProduto(){var inp=document.getElementById('new-prod');var n=inp.value.trim();if(!n)return;for(var i=0;i<produtos.length;i++){if(produtos[i]===n){inp.value='';return;}}produtos.push(n);inp.value='';render();}
-function addMeeiro(){var inp=document.getElementById('new-meeiro');var n=inp.value.trim();if(!n)return;for(var i=0;i<meeiros.length;i++){if(meeiros[i]===n){inp.value='';return;}}meeiros.push(n);inp.value='';render();}
+function addProduto(){var inp=document.getElementById('new-prod');var n=inp.value.trim();if(!n)return;for(var i=0;i<produtos.length;i++){if(produtos[i]===n){inp.value='';return;}}produtos.push(n);inp.value='';render();agendarSalvamento();}
+function addMeeiro(){var inp=document.getElementById('new-meeiro');var n=inp.value.trim();if(!n)return;for(var i=0;i<meeiros.length;i++){if(meeiros[i]===n){inp.value='';return;}}meeiros.push(n);inp.value='';render();agendarSalvamento();}
 function limparValores(){valores={};render();}
 
 function gerarCSV(){
