@@ -371,7 +371,9 @@ function renderTotais() {
     var m2=meeiros[mi2]; var t=0;
     for(var pi2=0;pi2<produtos.length;pi2++) t+=parseFloat((valores[m2]&&valores[m2][produtos[pi2]])||0);
     var el2=document.getElementById('total-'+mi2);
-    var cx = divisor > 0 ? fmt(t / divisor) : 0;
+    var divEl = document.getElementById('divisor-input');
+    var divVal = divEl ? (parseFloat(divEl.value) || 1) : 1;
+    var cx = divVal > 0 ? fmt(t / divVal) : 0;
     if(el2) el2.textContent = fmt(t) + ' | ' + cx + ' cx';
   }
   drawPizzaChart(data);
