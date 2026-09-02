@@ -86,6 +86,11 @@ body { font-family: -apple-system, Arial, sans-serif; background: #f4f7f2; min-h
     <div class="date-badge" id="date-badge"></div>
     <input type="date" id="input-data" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px;" />
   </div>
+  <div style="display:flex;align-items:center;gap:4px;background:#e8f5e9;border:1px solid #a5d6a7;border-radius:20px;padding:4px 10px;">
+    <span style="font-size:11px;font-weight:700;color:#2e7d32;white-space:nowrap;">&#247;</span>
+    <input type="number" id="divisor-input" min="1" value="1" style="width:42px;border:none;background:transparent;font-size:13px;font-weight:700;color:#2e7d32;text-align:center;outline:none;-webkit-appearance:none;" />
+    <span style="font-size:10px;font-weight:700;color:#2e7d32;white-space:nowrap;">cx</span>
+  </div>
 </div>
 
 <div class="container">
@@ -160,6 +165,7 @@ var CHART_COLORS = ['#2e7d32','#f39200','#1565c0','#c62828','#6a1b9a','#00838f',
 var produtos = [];
 var meeiros  = [];
 var valores  = {};
+var divisor  = 1;
 var dataAtual = new Date();
 var hoje = dataAtual.toISOString().slice(0,10);
 var hojeFormatado = dataAtual.toLocaleDateString('pt-BR');
@@ -243,6 +249,7 @@ function salvarDados() {
   }).then(function() {
     // Salvar config do dia (meeiros e produtos usados)
     var config = { meeiros: meeiros, produtos: produtos };
+    // Salva config silenciosamente
     fetch(SUPABASE_URL + '/rest/v1/coleta_config?data=eq.' + hoje, {
       method: 'DELETE',
       headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
@@ -252,7 +259,7 @@ function salvarDados() {
         headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY, 'Content-Type': 'application/json' },
         body: JSON.stringify([{ data: hoje, meeiros: JSON.stringify(meeiros), produtos: JSON.stringify(produtos) }])
       });
-    }).catch(function(){});
+    }).catch(function(e){ console.log('config save error:', e); });
 
     var registros = [];
     for (var mi = 0; mi < meeiros.length; mi++) {
@@ -263,8 +270,10 @@ function salvarDados() {
         if (v > 0) registros.push({ data: hoje, meeiro: m, produto: p, quantidade: v });
       }
     }
+    // Se nao tem valores ainda, salva apenas a config
     if (registros.length === 0) {
-      setStatus('Nenhum valor preenchido para salvar.', 'err');
+      setStatus('Configuracao salva!', 'ok');
+      showToast('✅ Meeiros e produtos salvos!');
       return;
     }
     console.log('INSERINDO registros:', registros.length, JSON.stringify(registros.slice(0,2)));
@@ -321,7 +330,7 @@ function renderMeeiros() {
         var val=(valores[m]&&valores[m][p]!==undefined&&valores[m][p]!=='')?valores[m][p]:'';
         fields+='<div class="pf"><label>'+p+'</label><input type="number" inputmode="decimal" min="0" step="0.5" placeholder="0" value="'+val+'" data-mi="'+mi+'" data-pi="'+pi+'"></div>';
       }
-      fields+='<div class="pf"><label>Total</label><div class="m-total-box" id="total-'+mi+'">0</div></div>';
+      fields+='<div class="pf"><label>Total | Caixotes</label><div class="m-total-box" id="total-'+mi+'">0 | 0 cx</div></div>';
     } else { fields='<span style="font-size:13px;color:#aaa;padding:8px 0;display:block">Adicione produtos acima.</span>'; }
     html+='<div class="meeiro-card"><div class="m-header"><div class="avatar" style="background:'+BGCOLORS[c]+';color:'+TXCOLORS[c]+'">'+ini(m)+'</div><span class="m-name">'+m+'</span><button class="del-btn" data-mi="'+mi+'">&#x1F5D1;</button></div><div class="prods-grid">'+fields+'</div></div>';
   }
@@ -523,7 +532,17 @@ document.getElementById('input-data').onchange = function() {
   document.getElementById('date-badge').textContent = hojeFormatado;
   valores = {};
   render();
-  carregarProdutosPlanner();
+  var divisorInp = document.getElementById('divisor-input');
+divisorInp.addEventListener('input', function() {
+  divisor = parseFloat(this.value) || 1;
+  renderTotais();
+});
+divisorInp.addEventListener('change', function() {
+  divisor = parseFloat(this.value) || 1;
+  renderTotais();
+});
+
+carregarProdutosPlanner();
 carregarDados();
 };
 
