@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>Coleta Meeiros v8 - AP</title>
+<script>try{if(localStorage.getItem('tema')==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}</script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 body { font-family: -apple-system, Arial, sans-serif; background: #f4f7f2; min-height: 100vh; }
@@ -72,9 +73,125 @@ body { font-family: -apple-system, Arial, sans-serif; background: #f4f7f2; min-h
 .modal-box h3 { font-size:15px;font-weight:700;color:#1b5e20; }
 .modal-box textarea { flex:1;border:1.5px solid #ddd;border-radius:8px;padding:10px;font-size:12px;font-family:monospace;min-height:200px;resize:none;outline:none; }
 .modal-close-row { display:flex;gap:8px; }
+
+/* ===== VISUAL TECH (glass) — bloco único, fácil de remover ===== */
+:root{
+  --g-fundo: radial-gradient(620px circle at 8% -4%, rgba(59,130,246,.50), transparent 62%),
+    radial-gradient(560px circle at 100% 8%, rgba(139,92,246,.40), transparent 62%),
+    radial-gradient(640px circle at 85% 105%, rgba(34,211,238,.30), transparent 62%),
+    radial-gradient(520px circle at 0% 95%, rgba(37,99,235,.28), transparent 62%),
+    linear-gradient(160deg,#0a1736 0%,#060c1f 55%,#02040c 100%);
+  --g-bg:rgba(13,22,48,.55); --g-bg-forte:rgba(22,36,78,.70); --g-border:rgba(96,165,250,.24);
+  --g-shadow:0 10px 34px rgba(0,0,0,.45), inset 0 1px 0 rgba(147,197,253,.14);
+  --g-input:rgba(8,14,32,.70); --g-header:rgba(6,12,30,.66); --g-line:rgba(96,165,250,.16);
+  --g-tile:rgba(59,130,246,.14); --g-acc:#67e8f9;
+  --texto:#e8eefc; --muda:#8a9bbd; --g-lista:#0a1128; --g-fundo-solido:#060c1f;
+  --g-titulo:linear-gradient(90deg,#fff,#9ec5ff 55%,#67e8f9);
+  --g-radius:16px; color-scheme:dark;
+}
+:root[data-theme=light]{
+  --g-fundo: radial-gradient(620px circle at 6% -4%, rgba(59,130,246,.34), transparent 62%),
+    radial-gradient(560px circle at 100% 10%, rgba(139,92,246,.26), transparent 62%),
+    radial-gradient(640px circle at 85% 105%, rgba(34,211,238,.28), transparent 62%),
+    linear-gradient(160deg,#eaf1ff 0%,#f3f0ff 55%,#eafbff 100%);
+  --g-bg:rgba(255,255,255,.62); --g-bg-forte:rgba(255,255,255,.82); --g-border:rgba(255,255,255,.90);
+  --g-shadow:0 8px 30px rgba(37,99,235,.14), inset 0 1px 0 rgba(255,255,255,.95);
+  --g-input:rgba(255,255,255,.80); --g-header:rgba(255,255,255,.66); --g-line:rgba(37,99,235,.14);
+  --g-tile:rgba(37,99,235,.09); --g-acc:#0e7490;
+  --texto:#16224a; --muda:#5b6b8f; --g-lista:#ffffff; --g-fundo-solido:#eaf1ff;
+  --g-titulo:linear-gradient(90deg,#1d4ed8,#7c3aed);
+  color-scheme:light;
+}
+body{background:var(--g-fundo-solido);color:var(--texto);}
+.fundo-glass{position:fixed;inset:0;z-index:0;pointer-events:none;background:var(--g-fundo);}
+.container{position:relative;z-index:1;}
+
+.header{background:var(--g-header);border-bottom:1px solid var(--g-border);box-shadow:var(--g-shadow);-webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%);}
+.logo{background:linear-gradient(135deg,#2563eb,#7c3aed);border-radius:12px;box-shadow:0 0 16px rgba(59,130,246,.45);}
+.header-text h1{background:var(--g-titulo);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;}
+.header-text .sub{color:var(--muda);}
+.date-badge{background:var(--g-tile);border:1px solid var(--g-border);color:var(--g-acc);}
+.tema-btn{width:36px;height:36px;min-width:36px;border-radius:10px;border:1px solid var(--g-border);background:var(--g-tile);color:var(--g-acc);display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-appearance:none;padding:0;}
+.tema-btn svg{width:18px;height:18px;}
+
+.card,.meeiro-card{background:var(--g-bg);border:1px solid var(--g-border);border-radius:var(--g-radius);box-shadow:var(--g-shadow);-webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%);}
+.m-header{border-bottom:1px solid var(--g-line);}
+.m-name{color:var(--texto);}
+.del-btn{color:var(--muda);}
+.del-btn:hover{color:#f87171;}
+.sec-label{color:var(--muda);display:flex;align-items:center;gap:8px;}
+.ic{display:inline-flex;align-items:center;justify-content:center;}
+.sec-label .ic{width:26px;height:26px;border-radius:8px;background:var(--g-tile);border:1px solid var(--g-border);color:var(--g-acc);}
+.sec-label .ic svg{width:15px;height:15px;}
+.btn-g .ic{margin-right:6px;vertical-align:-3px;}
+.btn-g .ic svg{width:16px;height:16px;}
+
+.tag{background:var(--g-tile);border:1px solid var(--g-border);color:var(--texto);}
+.tag-x{color:var(--g-acc);}
+
+.add-row input,.pf input,.modal-box textarea,#divisor-input{background:var(--g-input);border:1.5px solid var(--g-border);color:var(--texto);}
+.add-row input::placeholder,.pf input::placeholder{color:var(--muda);}
+.add-row input:focus,.pf input:focus,#divisor-input:focus{border-color:#22d3ee;background:var(--g-input);box-shadow:0 0 0 3px rgba(59,130,246,.25);outline:none;}
+button:focus-visible{outline:2px solid #22d3ee;outline-offset:2px;}
+.pf label{color:var(--muda);}
+.div-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.div-txt{font-size:14px;color:var(--muda);}
+#divisor-input{width:70px;border-radius:8px;padding:8px;font-size:18px;font-weight:700;color:var(--g-acc);text-align:center;-webkit-appearance:none;}
+
+.btn-g{background:linear-gradient(135deg,#2563eb,#7c3aed);box-shadow:0 4px 14px rgba(37,99,235,.35);}
+.btn-g:hover{filter:brightness(1.1);box-shadow:0 4px 20px rgba(124,58,237,.5);}
+.btn-o{background:transparent;color:var(--g-acc);border:1.5px solid #22d3ee;}
+.btn-r{background:linear-gradient(135deg,#dc2626,#be123c);box-shadow:0 4px 14px rgba(220,38,38,.3);}
+
+.m-total-box{border:1.5px solid #22d3ee;background:rgba(34,211,238,.12);color:var(--g-acc);}
+.tc{background:var(--g-tile);border:1px solid var(--g-border);}
+.tc .tl{color:var(--g-acc);}
+.tc .tv{color:var(--texto);font-variant-numeric:tabular-nums;}
+.tc.geral{background:linear-gradient(135deg,#2563eb,#7c3aed);border-color:transparent;box-shadow:0 4px 18px rgba(37,99,235,.4);}
+.tc.geral .tl{color:rgba(255,255,255,.8);}
+.tc.geral .tv{color:#fff;}
+.legend-item{color:var(--texto);}
+.empty{color:var(--muda);border:1.5px dashed var(--g-border);background:var(--g-tile);}
+
+.status-bar{background:var(--g-bg);color:var(--muda);border:1px solid var(--g-line);}
+.status-bar.ok{color:#34d399;background:rgba(16,185,129,.12);}
+.status-bar.err{color:#f87171;background:rgba(239,68,68,.12);}
+:root[data-theme=light] .status-bar.ok{color:#047857;}
+:root[data-theme=light] .status-bar.err{color:#b91c1c;}
+.toast-msg{background:linear-gradient(135deg,#059669,#0891b2);}
+.toast-msg.erro{background:linear-gradient(135deg,#dc2626,#be123c);}
+
+.modal-overlay{background:rgba(2,4,12,.6);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);}
+.modal-box{background:var(--g-bg-forte);border:1px solid var(--g-border);box-shadow:var(--g-shadow);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);}
+:root:not([data-theme=light]) .modal-box{background:#0d1630;}
+.modal-box h3{color:var(--texto);}
+
+@media (max-width:768px){
+  .header,.card,.meeiro-card{-webkit-backdrop-filter:blur(10px) saturate(140%);backdrop-filter:blur(10px) saturate(140%);}
+  .header{gap:8px;padding:10px 12px;}
+  .header-text h1{font-size:14px;}
+}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .header{background:var(--g-lista);} .card,.meeiro-card{background:var(--g-lista);}
+}
+@media (prefers-reduced-transparency:reduce){
+  .header,.card,.meeiro-card,.modal-box{background:var(--g-lista);-webkit-backdrop-filter:none;backdrop-filter:none;}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;}}
+
+.planner-box{margin:4px 0 10px;padding:10px;border:1px dashed var(--g-border);border-radius:12px;background:var(--g-tile);}
+.planner-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px;flex-wrap:wrap;}
+.planner-tit{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--muda);}
+.planner-acts{display:flex;gap:6px;}
+.btn-mini{padding:5px 10px;font-size:12px;border-radius:8px;}
+.ptag{background:transparent;border:1px solid var(--g-border);border-radius:20px;padding:6px 12px;font-size:13px;color:var(--texto);cursor:pointer;-webkit-appearance:none;}
+.ptag.on{background:linear-gradient(135deg,#2563eb,#7c3aed);border-color:transparent;color:#fff;font-weight:700;}
+/* ===== fim VISUAL TECH ===== */
+
 </style>
 </head>
 <body>
+<div class="fundo-glass" aria-hidden="true"></div>
 
 <div class="header">
   <div class="logo">AP</div>
@@ -82,6 +199,7 @@ body { font-family: -apple-system, Arial, sans-serif; background: #f4f7f2; min-h
     <h1>Coleta de Dados — Meeiros v8</h1>
     <div class="sub" id="date-sub"></div>
   </div>
+  <button type="button" class="tema-btn" id="tema-btn" aria-label="Alternar tema claro/escuro" title="Claro / escuro"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v18" /><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg></button>
   <div style="position:relative;display:inline-block;">
     <div class="date-badge" id="date-badge"></div>
     <input type="date" id="input-data" style="position:absolute;top:0;left:0;width:100%;height:100%;opacity:0;cursor:pointer;font-size:16px;" />
@@ -92,8 +210,15 @@ body { font-family: -apple-system, Arial, sans-serif; background: #f4f7f2; min-h
   <div class="status-bar" id="status-bar">Conectando ao banco de dados...</div>
 
   <div class="card">
-    <div class="sec-label">Produtos</div>
+    <div class="sec-label"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></svg></span>Produtos</div>
     <div class="tags" id="prod-tags"></div>
+    <div class="planner-box">
+      <div class="planner-head">
+        <span class="planner-tit">Estoque do Planner (dia) &mdash; toque para marcar</span>
+        <span class="planner-acts"><button type="button" class="btn-o btn-mini" id="btn-planner-todos">+ Todos</button><button type="button" class="btn-o btn-mini" id="btn-planner-reload" aria-label="Atualizar lista do Planner">&#8635;</button></span>
+      </div>
+      <div class="tags" id="planner-tags"><span style="font-size:13px;color:#aaa">Carregando...</span></div>
+    </div>
     <div class="add-row">
       <input type="text" id="new-prod" placeholder="Novo produto..." maxlength="30" autocomplete="off">
       <button class="btn-g" id="btn-add-prod">+ Produto</button>
@@ -101,7 +226,7 @@ body { font-family: -apple-system, Arial, sans-serif; background: #f4f7f2; min-h
   </div>
 
   <div class="card">
-    <div class="sec-label">Adicionar Meeiro</div>
+    <div class="sec-label"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" x2="19" y1="8" y2="14"/><line x1="22" x2="16" y1="11" y2="11"/></svg></span>Adicionar Meeiro</div>
     <div class="add-row">
       <input type="text" id="new-meeiro" placeholder="Nome do meeiro..." maxlength="30" autocomplete="off">
       <button class="btn-g" id="btn-add-meeiro">+ Meeiro</button>
@@ -109,24 +234,23 @@ body { font-family: -apple-system, Arial, sans-serif; background: #f4f7f2; min-h
   </div>
 
   <div class="card" style="margin-bottom:10px;">
-    <div class="sec-label">Divisor de Caixotes</div>
-    <div style="display:flex;align-items:center;gap:10px;">
-      <span style="font-size:14px;color:#555;">Unidades por caixote:</span>
-      <input type="number" id="divisor-input" min="1" value="1" inputmode="numeric"
-        style="width:70px;border:1.5px solid #4caf50;border-radius:8px;padding:8px;font-size:18px;font-weight:700;color:#2e7d32;text-align:center;outline:none;-webkit-appearance:none;" />
-      <span style="font-size:14px;color:#555;">unidades = 1 caixote</span>
+    <div class="sec-label"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><path d="M16 10h.01M12 10h.01M8 10h.01M12 14h.01M8 14h.01M12 18h.01M8 18h.01M16 14v4"/></svg></span>Divisor de Caixotes</div>
+    <div class="div-row">
+      <span class="div-txt">Unidades por caixote:</span>
+      <input type="number" id="divisor-input" min="1" value="1" inputmode="numeric" />
+      <span class="div-txt">unidades = 1 caixote</span>
     </div>
   </div>
 
   <div id="meeiros-list"></div>
 
   <div class="card">
-    <div class="sec-label">Totais por produto</div>
+    <div class="sec-label"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></svg></span>Totais por produto</div>
     <div class="totais-grid" id="totais-grid"></div>
   </div>
 
   <div class="card">
-    <div class="sec-label">Distribuicao por produto</div>
+    <div class="sec-label"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg></span>Distribuicao por produto</div>
     <div class="chart-wrap">
       <canvas id="pizza-chart" width="300" height="300"></canvas>
     </div>
@@ -134,7 +258,7 @@ body { font-family: -apple-system, Arial, sans-serif; background: #f4f7f2; min-h
   </div>
 
   <div class="card">
-    <div class="sec-label">Divisao de Lucro</div>
+    <div class="sec-label"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" x2="5" y1="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg></span>Divisao de Lucro</div>
     <div class="chart-wrap">
       <canvas id="lucro-chart" width="300" height="300"></canvas>
     </div>
@@ -142,7 +266,7 @@ body { font-family: -apple-system, Arial, sans-serif; background: #f4f7f2; min-h
   </div>
 
   <div class="actions">
-    <button class="btn-g" id="btn-salvar">Salvar dados</button>
+    <button class="btn-g" id="btn-salvar"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"/><path d="M7 3v4a1 1 0 0 0 1 1h7"/></svg></span>Salvar dados</button>
     <button class="btn-g" id="btn-csv">Ver CSV</button>
     <button class="btn-r" id="btn-limpar">Limpar valores</button>
   </div>
@@ -311,7 +435,7 @@ function ini(n) { return n.split(' ').slice(0,2).map(function(w){ return w[0].to
 function colorIdx(name) { var h=0; for(var i=0;i<name.length;i++) h=(h*31+name.charCodeAt(i))&0xffff; return h%BGCOLORS.length; }
 function fmt(v) { return v%1===0?v:v.toFixed(1); }
 
-function render() { renderProdTags(); renderMeeiros(); renderTotais(); }
+function render() { renderProdTags(); renderMeeiros(); renderTotais(); renderPlannerChips(); }
 
 function renderProdTags() {
   var el = document.getElementById('prod-tags');
@@ -422,14 +546,55 @@ var PLANNER_FORNECEDOR_ID = 'a0312074-2491-4ded-af32-a59ebe8f3737';
 var plannerProdutos = []; // carregado do Supabase
 
 function carregarProdutosPlanner() {
-  fetch(SUPABASE_URL + '/rest/v1/produtos?categoria=eq.Morango&ativo=eq.true&select=id,nome', {
-    headers: {
-      'apikey': SUPABASE_KEY,
-      'Authorization': 'Bearer ' + SUPABASE_KEY
-    }
-  }).then(function(r){ return r.json(); })
-  .then(function(data){ if(data) plannerProdutos = data; })
-  .catch(function(){});
+  // So os produtos que estao na tabela estoque do Planner na data selecionada (somente nomes)
+  var hd = { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY };
+  var diaConsulta = hoje;
+  Promise.all([
+    fetch(SUPABASE_URL + '/rest/v1/estoque?data=eq.' + diaConsulta + '&select=produto_id', { headers: hd }).then(function(r){ return r.json(); }),
+    fetch(SUPABASE_URL + '/rest/v1/produtos?select=id,nome&order=ordem.asc', { headers: hd }).then(function(r){ return r.json(); })
+  ]).then(function(res) {
+    if (diaConsulta !== hoje) return;
+    if (!Array.isArray(res[0]) || !Array.isArray(res[1])) throw new Error('resposta invalida');
+    var ids = {};
+    for (var i = 0; i < res[0].length; i++) ids[res[0][i].produto_id] = true;
+    var lista = [];
+    for (var j = 0; j < res[1].length; j++) { if (ids[res[1][j].id]) lista.push(res[1][j]); }
+    plannerProdutos = lista; plannerErro = false; renderPlannerChips();
+  }).catch(function(){ plannerErro = true; renderPlannerChips(); });
+}
+
+var plannerErro = false;
+function renderPlannerChips() {
+  var el = document.getElementById('planner-tags'); if (!el) return;
+  el.innerHTML = '';
+  if (plannerErro) { el.innerHTML = '<span style="font-size:13px;color:#aaa">Nao foi possivel carregar do Planner. Toque em atualizar.</span>'; return; }
+  if (!plannerProdutos.length) { el.innerHTML = '<span style="font-size:13px;color:#aaa">Sem estoque lancado no Planner em ' + hojeFormatado + '.</span>'; return; }
+  for (var i = 0; i < plannerProdutos.length; i++) {
+    (function(nome){
+      var b = document.createElement('button');
+      b.type = 'button';
+      var on = idxProduto(nome) !== -1;
+      b.className = 'ptag' + (on ? ' on' : '');
+      b.textContent = (on ? '\u2713 ' : '+ ') + nome;
+      b.onclick = function(){ alternarProdutoPlanner(nome); };
+      el.appendChild(b);
+    })(plannerProdutos[i].nome);
+  }
+}
+function idxProduto(nome) {
+  var n = normalizar(nome);
+  for (var i = 0; i < produtos.length; i++) { if (normalizar(produtos[i]) === n) return i; }
+  return -1;
+}
+function alternarProdutoPlanner(nome) {
+  var idx = idxProduto(nome);
+  if (idx === -1) { produtos.push(nome); }
+  else { var antigo = produtos[idx]; produtos.splice(idx, 1); for (var m in valores) { if (valores[m]) delete valores[m][antigo]; } }
+  render(); agendarSalvamento();
+}
+function adicionarTodosPlanner() {
+  for (var i = 0; i < plannerProdutos.length; i++) { if (idxProduto(plannerProdutos[i].nome) === -1) produtos.push(plannerProdutos[i].nome); }
+  render(); agendarSalvamento();
 }
 
 function normalizar(str) {
@@ -441,9 +606,11 @@ function normalizar(str) {
 function buscarIdProdutoPlanner(nomeProduto) {
   var n = normalizar(nomeProduto);
   for (var i = 0; i < plannerProdutos.length; i++) {
-    var pn = normalizar(plannerProdutos[i].nome);
-    if (pn === n) return plannerProdutos[i].id;
-    if (pn.indexOf(n) !== -1 || n.indexOf(pn) !== -1) return plannerProdutos[i].id;
+    if (normalizar(plannerProdutos[i].nome) === n) return plannerProdutos[i].id;
+  }
+  for (var k = 0; k < plannerProdutos.length; k++) {
+    var pn = normalizar(plannerProdutos[k].nome);
+    if (pn.indexOf(n) !== -1 || n.indexOf(pn) !== -1) return plannerProdutos[k].id;
   }
   return null;
 }
@@ -517,6 +684,8 @@ function gerarCSV(){
 document.getElementById('btn-add-prod').onclick=addProduto;
 document.getElementById('btn-add-meeiro').onclick=addMeeiro;
 document.getElementById('btn-limpar').onclick=limparValores;
+document.getElementById('btn-planner-todos').onclick=adicionarTodosPlanner;
+document.getElementById('btn-planner-reload').onclick=carregarProdutosPlanner;
 var btnSalvar = document.getElementById('btn-salvar');
 btnSalvar.addEventListener('click', salvarDados);
 btnSalvar.addEventListener('touchend', function(e){ e.preventDefault(); salvarDados(); });
@@ -554,8 +723,13 @@ carregarProdutosPlanner();
 carregarDados();
 };
 
+carregarProdutosPlanner();
 carregarDados();
 </script>
 <div class="toast-msg" id="toast-msg"></div>
+<script>
+/* VISUAL TECH: alternar tema (só aparência) */
+(function(){var b=document.getElementById('tema-btn');if(!b)return;b.addEventListener('click',function(){var r=document.documentElement;var claro=r.getAttribute('data-theme')==='light';if(claro)r.removeAttribute('data-theme');else r.setAttribute('data-theme','light');try{localStorage.setItem('tema',claro?'dark':'light');}catch(e){}});})();
+</script>
 </body>
 </html>
